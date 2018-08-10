@@ -82,6 +82,9 @@ type Regexp struct {
 	// read-only after Compile
 	regexpRO
 
+	// FORK: This fork of regexp tracks and exposes the syntax.Regexp.
+	syntax_re *syntax.Regexp
+
 	// cache of machines for running regexp
 	mu      sync.Mutex
 	machine []*machine
@@ -189,6 +192,9 @@ func compile(expr string, mode syntax.Flags, longest bool) (*Regexp, error) {
 			cond:        prog.StartCond(),
 			longest:     longest,
 		},
+
+		// FORK: This fork of regexp tracks and exposes the syntax.Regexp.
+		syntax_re: re,
 	}
 	if regexp.onepass == notOnePass {
 		regexp.prefix, regexp.prefixComplete = prog.Prefix()
@@ -1180,4 +1186,9 @@ func (re *Regexp) Split(s string, n int) []string {
 	}
 
 	return strings
+}
+
+// FORK: This fork of regexp tracks and exposes the syntax.Regexp.
+func (re *Regexp) SyntaxRegexp() *syntax.Regexp {
+	return re.syntax_re
 }
